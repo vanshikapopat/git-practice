@@ -30,3 +30,6 @@ Working on Story 6 was a big shift in how I think about programming the robot. U
 Using the same breadboard for the figure-of-eight made the transition from the distance-tracking story much faster. I shifted the logic back to using precise timing specifically that 850ms turn window to nail the 90-degree corners. It was interesting to see how the same hardware setup can perform totally different missions just by changing the software logic from interrupts back to timed loops. Getting the rover to transition from the left-hand square to the right-hand square automatically was a great success.
 
 ![My Rover](Story7_Figureof8/rover7.png)
+
+## Story 8: Dodge
+Duplicating the Story 6 circuit was the smartest starting point because it already had the interrupt button wired up. The main difference for Story 8 was adding the extra wires for the reverse LEDs. It felt a bit like a puzzle making sure I didn't plug a motor pin into the same slot as my button pin, but once the reverse' hardware was in place, the board was ready. It’s cool to see how a circuit that just counted pulses before can now be used to trigger a complex safety sequence just by changing the logic in the IDE.
