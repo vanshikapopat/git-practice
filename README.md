@@ -20,3 +20,8 @@ Refactoring the code for Story 4 really changed how I look at the project. In th
 
 ## Story 5: Snaking
 Working on Story 5 taught me a lot about controlling motor speed. Instead of just turning motors on or off, I used analogWrite to make the robot move at different speeds, which allowed it to curve and snake around. I had to use the correct PWM pins for variable speed, and organizing the code into functions kept it neat. It was really satisfying to see the robot turn smoothly just by slowing one side of the drivetrain.
+
+## Story 6: Interrupts
+Working on Story 6 was a big shift in how I think about programming the robot. Up until now, everything was based on timers, but this story forced me to use Interrupts to track actual physical movement. It was definitely a challenge at first my LEDs wouldn't turn off because I had wired both the signal and ground wires to the same side of the button, which meant the Arduino couldn't see the clicks. Once I fixed the wiring to a diagonal setup and used the INPUT_PULLUP feature in the code, it was really satisfying to see the hardware respond to my input in real-time. Instead of just guessing how long 2 meters takes, the robot now stays active until it "feels" the 100th pulse from the sensor. 
+
+![My Rover](rover6.png)
