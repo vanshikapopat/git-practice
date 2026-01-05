@@ -34,5 +34,5 @@ Using the same breadboard for the figure-of-eight made the transition from the d
 ## Story 8: Dodge
 Duplicating the Story 6 circuit was the smartest starting point because it already had the interrupt button wired up. The main difference for Story 8 was adding the extra wires for the reverse LEDs. It felt a bit like a puzzle making sure I didn't plug a motor pin into the same slot as my button pin, but once the reverse' hardware was in place, the board was ready. It’s cool to see how a circuit that just counted pulses before can now be used to trigger a complex safety sequence just by changing the logic in the IDE.
 
-## Story 8: Dodge
+## Story 9: Cliff
 Story 9 was about safety. I used the same button interrupt logic, but the response had to be much more permanent. Unlike the obstacle avoidance where the robot continues on, the Cliff Detection code is designed to stop the robot indefinitely after reversing so it doesn't accidentally find another ledge. Watching the Red LEDs pulse for only half a second before everything went dark was a perfect confirmation that the emergency brake and retreat logic were executed exactly as requested.
