@@ -17,3 +17,6 @@ It was a challenging task however I believe I have now understood how to push fi
 
 ## Story 4: Refactoration
 Refactoring the code for Story 4 really changed how I look at the project. In the beginning, I was just focused on getting the LEDs to blink at the right time, but the code looked messy. Moving everything into specific functions like moveForward() and stopRobot() made the whole thing so much easier to read and it actually looks like a set of directions now rather than just a bunch of pin numbers.
+
+## Story 5: Snaking
+Working on Story 5 taught me a lot about controlling motor speed. Instead of just turning motors on or off, I used analogWrite to make the robot move at different speeds, which allowed it to curve and snake around. I had to use the correct PWM pins for variable speed, and organizing the code into functions kept it neat. It was really satisfying to see the robot turn smoothly just by slowing one side of the drivetrain.
