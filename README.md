@@ -8,4 +8,4 @@ I found the coding part easy once I got the hang of it. I found setting up git t
 ## Story 2: Two LEDs Alternating
 I duplicated Story 1 in TinkerCad, added a second LED, and modified the code so they alternate every second.I had an issue where there was a short circuit but with some help I figured it out. Both LEDs flash alternately with no overlap. Tested successfully. I am still getting used to git and learning how to push files and the Arduino code onto GitHub but hopefully I get the hang of it!
 
-
+![My Rover](rover2.png)
