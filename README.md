@@ -14,3 +14,6 @@ I duplicated Story 1 in TinkerCad, added a second LED, and modified the code so 
 It was a challenging task however I believe I have now understood how to push files to Git and to make circuits on TinkerCad. The rover successfully works and meets the acceptance criteria.
 
 ![My Rover](rover3.png)
+
+## Story 4: Refactoration
+Refactoring the code for Story 4 really changed how I look at the project. In the beginning, I was just focused on getting the LEDs to blink at the right time, but the code looked messy. Moving everything into specific functions like moveForward() and stopRobot() made the whole thing so much easier to read and it actually looks like a set of directions now rather than just a bunch of pin numbers.
