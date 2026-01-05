@@ -10,7 +10,7 @@ I duplicated Story 1 in TinkerCad, added a second LED, and modified the code so 
 
 ![My Rover](rover2.png)
 
-## Story 2: Motor
+## Story 3: Motor
 It was a challenging task however I believe I have now understood how to push files to Git and to make circuits on TinkerCad. The rover successfully works and meets the acceptance criteria.
 
 ![My Rover](rover3.png)
