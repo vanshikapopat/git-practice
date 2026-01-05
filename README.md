@@ -25,3 +25,8 @@ Working on Story 5 taught me a lot about controlling motor speed. Instead of jus
 Working on Story 6 was a big shift in how I think about programming the robot. Up until now, everything was based on timers, but this story forced me to use Interrupts to track actual physical movement. It was definitely a challenge at first my LEDs wouldn't turn off because I had wired both the signal and ground wires to the same side of the button, which meant the Arduino couldn't see the clicks. Once I fixed the wiring to a diagonal setup and used the INPUT_PULLUP feature in the code, it was really satisfying to see the hardware respond to my input in real-time. Instead of just guessing how long 2 meters takes, the robot now stays active until it "feels" the 100th pulse from the sensor. 
 
 ![My Rover](Story6_Interrupts/rover6.png)
+
+## Story 7: Figureof8
+Using the same breadboard for the figure-of-eight made the transition from the distance-tracking story much faster. I shifted the logic back to using precise timing specifically that 850ms turn window to nail the 90-degree corners. It was interesting to see how the same hardware setup can perform totally different missions just by changing the software logic from interrupts back to timed loops. Getting the rover to transition from the left-hand square to the right-hand square automatically was a great success.
+
+![My Rover](Story7_Figureof8/rover7.png)
