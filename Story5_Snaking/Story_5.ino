@@ -1,82 +1,143 @@
+// Story 5: Rover Movement with Snake Pattern
+// Builds on Story 4
 
-// Pins
-const int MOTOR_L_FWD = 5;  
-const int MOTOR_R_FWD = 6;  
-const int MOTOR_L_REV = 3;  
-const int MOTOR_R_REV = 2;  
+// Motor control pins
+int leftRev = 12;
+int leftFwd = 11;
+int leftEnable = 10;
 
+int rightEnable = 9;
+int rightFwd = 8;
+int rightRev = 7;
+
+// Setup
 void setup() {
-  pinMode(MOTOR_L_FWD, OUTPUT);
-  pinMode(MOTOR_R_FWD, OUTPUT);
-  pinMode(MOTOR_L_REV, OUTPUT);
-  pinMode(MOTOR_R_REV, OUTPUT);
+  pinMode(leftRev, OUTPUT);
+  pinMode(leftFwd, OUTPUT);
+  pinMode(leftEnable, OUTPUT);
 
-  runStory5();
+  pinMode(rightEnable, OUTPUT);
+  pinMode(rightFwd, OUTPUT);
+  pinMode(rightRev, OUTPUT);
+}
+// Story 4 Functions
+
+// Move Forward for fixed time
+void moveForward() {
+  digitalWrite(leftEnable, HIGH);
+  digitalWrite(leftFwd, HIGH);
+  digitalWrite(leftRev, LOW);
+
+  digitalWrite(rightEnable, HIGH);
+  digitalWrite(rightFwd, HIGH);
+  digitalWrite(rightRev, LOW);
+
+  delay(5000); // 5 seconds forward
 }
 
+// Stop Rover for fixed time
+void stopRover() {
+  digitalWrite(leftEnable, LOW);
+  digitalWrite(rightEnable, LOW);
+
+  digitalWrite(leftFwd, LOW);
+  digitalWrite(leftRev, LOW);
+  digitalWrite(rightFwd, LOW);
+  digitalWrite(rightRev, LOW);
+
+  delay(1000); // 1 second stop
+}
+
+// Move Reverse for fixed time
+void moveReverse() {
+  digitalWrite(leftEnable, HIGH);
+  digitalWrite(leftFwd, LOW);
+  digitalWrite(leftRev, HIGH);
+
+  digitalWrite(rightEnable, HIGH);
+  digitalWrite(rightFwd, LOW);
+  digitalWrite(rightRev, HIGH);
+
+  delay(2000); // 2 seconds reverse
+}
+// Story 5 Functions (PWM Control)
+// Move straight at a given speed
+void moveStraight(int speed) {
+  digitalWrite(leftFwd, HIGH);
+  digitalWrite(leftRev, LOW);
+  digitalWrite(rightFwd, HIGH);
+  digitalWrite(rightRev, LOW);
+
+  analogWrite(leftEnable, speed);
+  analogWrite(rightEnable, speed);
+}
+
+// Turn left by slowing left motor
+void moveLeft(int speedLeft, int speedRight) {
+  digitalWrite(leftFwd, HIGH);
+  digitalWrite(leftRev, LOW);
+  digitalWrite(rightFwd, HIGH);
+  digitalWrite(rightRev, LOW);
+
+  analogWrite(leftEnable, speedLeft);
+  analogWrite(rightEnable, speedRight);
+}
+
+// Turn right by slowing right motor
+void moveRight(int speedLeft, int speedRight) {
+  digitalWrite(leftFwd, HIGH);
+  digitalWrite(leftRev, LOW);
+  digitalWrite(rightFwd, HIGH);
+  digitalWrite(rightRev, LOW);
+
+  analogWrite(leftEnable, speedLeft);
+  analogWrite(rightEnable, speedRight);
+}
+
+// Stop motors with optional delay
+void stopMotors(int delayTime) {
+  analogWrite(leftEnable, 0);
+  analogWrite(rightEnable, 0);
+
+  digitalWrite(leftFwd, LOW);
+  digitalWrite(leftRev, LOW);
+  digitalWrite(rightFwd, LOW);
+  digitalWrite(rightRev, LOW);
+
+  delay(delayTime);
+}
+
+// Story 4 Function
+// Runs the full Story 4 sequence
+void Story4() {
+  moveForward();
+  stopRover();
+  moveReverse();
+  stopRover();
+}
+
+// Story 5 Function
+// Snake movement sequence
+void Story5() {
+  moveStraight(200); // 2 sec straight
+  delay(2000);
+
+  moveLeft(150, 255); // 2 sec left
+  delay(2000);
+
+  moveRight(255, 150); // 2 sec right
+  delay(2000);
+
+  moveLeft(150, 255); // 2 sec left
+  delay(2000);
+
+  moveRight(255, 150); // 2 sec right
+  delay(2000);
+
+  stopMotors(1000); // final stop
+}
+
+// Main loop
 void loop() {
-}
-
-void runStory5() {
-  // 2s straight, 2s left, 2s right, 2s left, 2s right
-  moveStraight(255, 2000); 
-  moveLeft(130, 2000);     
-  moveRight(130, 2000);
-  moveLeft(130, 2000);
-  moveRight(130, 2000);
-  stopRobot(0);
-}
-
-void runStory4() {
-  moveForward(5000);
-  stopRobot(1000);
-  moveReverse(2000);
-}
-
-
-// Moves straight
-void moveStraight(int speed, int duration) {
-  analogWrite(MOTOR_L_FWD, speed);
-  analogWrite(MOTOR_R_FWD, speed);
-  digitalWrite(MOTOR_L_REV, LOW);
-  digitalWrite(MOTOR_R_REV, LOW);
-  delay(duration);
-}
-
-// Curves left
-void moveLeft(int turnSpeed, int duration) {
-  analogWrite(MOTOR_L_FWD, turnSpeed); 
-  analogWrite(MOTOR_R_FWD, 255);       
-  delay(duration);
-}
-
-// Curves right
-void moveRight(int turnSpeed, int duration) {
-  analogWrite(MOTOR_L_FWD, 255);
-  analogWrite(MOTOR_R_FWD, turnSpeed);
-  delay(duration);
-}
-
-void moveForward(int duration) {
-  digitalWrite(MOTOR_L_FWD, HIGH);
-  digitalWrite(MOTOR_R_FWD, HIGH);
-  digitalWrite(MOTOR_L_REV, LOW);
-  digitalWrite(MOTOR_R_REV, LOW);
-  delay(duration);
-}
-
-void moveReverse(int duration) {
-  digitalWrite(MOTOR_L_FWD, LOW);
-  digitalWrite(MOTOR_R_FWD, LOW);
-  digitalWrite(MOTOR_L_REV, HIGH);
-  digitalWrite(MOTOR_R_REV, HIGH);
-  delay(duration);
-}
-
-void stopRobot(int duration) {
-  digitalWrite(MOTOR_L_FWD, LOW);
-  digitalWrite(MOTOR_R_FWD, LOW);
-  digitalWrite(MOTOR_L_REV, LOW);
-  digitalWrite(MOTOR_R_REV, LOW);
-  delay(duration);
+  Story5(); // Run the snake movement
 }
