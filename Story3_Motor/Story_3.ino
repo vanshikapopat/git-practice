@@ -1,35 +1,53 @@
+// Motor control pins
+int leftRev = 12;
+int leftFwd = 11;
+int leftEnable = 10;
+
+int rightEnable = 9;
+int rightFwd = 8;
+int rightRev = 7;
+
 void setup() {
-  // Initialize all used pins as outputs
-  pinMode(2, OUTPUT); // Red LED
-  pinMode(3, OUTPUT); // Yellow LED
-  pinMode(4, OUTPUT); // Green LED 1
-  pinMode(5, OUTPUT); // Green LED 2
+  pinMode(leftRev, OUTPUT);
+  pinMode(leftFwd, OUTPUT);
+  pinMode(leftEnable, OUTPUT);
+
+  pinMode(rightEnable, OUTPUT);
+  pinMode(rightFwd, OUTPUT);
+  pinMode(rightRev, OUTPUT);
 }
 
 void loop() {
   // --- 1. FORWARD (5 Seconds) ---
-  // Turn on Green LEDs, turn off others
-  digitalWrite(4, HIGH);
-  digitalWrite(5, HIGH);
-  digitalWrite(2, LOW);
-  digitalWrite(3, LOW);
-  delay(5000); // Wait for 5 seconds
+  digitalWrite(leftEnable, HIGH);
+  digitalWrite(leftFwd, HIGH);
+  digitalWrite(leftRev, LOW);
+
+  digitalWrite(rightEnable, HIGH);
+  digitalWrite(rightFwd, HIGH);
+  digitalWrite(rightRev, LOW);
+
+  delay(5000);
 
   // --- 2. STOP (1 Second) ---
-  // Turn all LEDs off
-  digitalWrite(4, LOW);
-  digitalWrite(5, LOW);
-  digitalWrite(2, LOW);
-  digitalWrite(3, LOW);
-  delay(1000); // Wait for 1 second
+  digitalWrite(leftEnable, LOW);
+  digitalWrite(rightEnable, LOW);
+
+  digitalWrite(leftFwd, LOW);
+  digitalWrite(leftRev, LOW);
+  digitalWrite(rightFwd, LOW);
+  digitalWrite(rightRev, LOW);
+
+  delay(1000);
 
   // --- 3. REVERSE (2 Seconds) ---
-  // Turn on Red and Yellow LEDs, turn off Green
-  digitalWrite(4, LOW);
-  digitalWrite(5, LOW);
-  digitalWrite(2, HIGH);
-  digitalWrite(3, HIGH);
-  delay(2000); // Wait for 2 seconds
-  
-  // The loop then restarts from the beginning
+  digitalWrite(leftEnable, HIGH);
+  digitalWrite(leftFwd, LOW);
+  digitalWrite(leftRev, HIGH);
+
+  digitalWrite(rightEnable, HIGH);
+  digitalWrite(rightFwd, LOW);
+  digitalWrite(rightRev, HIGH);
+
+  delay(2000);
 }
