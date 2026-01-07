@@ -1,40 +1,74 @@
+// STORY 6 – INTERRUPTS
 
-// Pins
-const int MOTOR_L_FWD = 5;  
-const int MOTOR_R_FWD = 6;  
-const int BUTTON_PIN = 2; 
+const int leftRev     = 12;
+const int leftFwd     = 11;
+const int leftEnable  = 10;
 
-// Variables
-volatile int pulseCount = 0; 
-const int targetPulses = 100; // 100 pulses = 2 meters
+const int rightEnable = 9;
+const int rightFwd    = 8;
+const int rightRev    = 7;
+
+const int leftSensor  = 2;   // Interrupt pin
+const int rightSensor = 3;   // Interrupt pin
+
+volatile int pulseCount = 0;
+const int pulsesFor2m = 100;   // Calibrated value
+
+void countLeft() {
+  pulseCount++;
+}
+
+void countRight() {
+  pulseCount++;
+}
+void moveForward() {
+  digitalWrite(leftEnable, HIGH);
+  digitalWrite(leftFwd, HIGH);
+  digitalWrite(leftRev, LOW);
+
+  digitalWrite(rightEnable, HIGH);
+  digitalWrite(rightFwd, HIGH);
+  digitalWrite(rightRev, LOW);
+}
+
+void stopMotors() {
+  digitalWrite(leftEnable, LOW);
+  digitalWrite(rightEnable, LOW);
+
+  digitalWrite(leftFwd, LOW);
+  digitalWrite(leftRev, LOW);
+  digitalWrite(rightFwd, LOW);
+  digitalWrite(rightRev, LOW);
+}
+
+void story6() {
+  pulseCount = 0;     // Reset distance
+  moveForward();      // Start moving
+
+  while (pulseCount < pulsesFor2m) {
+  }
+
+  stopMotors();       
+
+  while (true) {
+  }
+}
 
 void setup() {
-  pinMode(MOTOR_L_FWD, OUTPUT);
-  pinMode(MOTOR_R_FWD, OUTPUT);
-  
-  pinMode(BUTTON_PIN, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), addPulse, FALLING);
+  pinMode(leftRev, OUTPUT);
+  pinMode(leftFwd, OUTPUT);
+  pinMode(leftEnable, OUTPUT);
 
-  runStory6();
+  pinMode(rightEnable, OUTPUT);
+  pinMode(rightFwd, OUTPUT);
+  pinMode(rightRev, OUTPUT);
+
+  pinMode(leftSensor, INPUT_PULLUP);
+  pinMode(rightSensor, INPUT_PULLUP);
+
+  attachInterrupt(digitalPinToInterrupt(leftSensor), countLeft, FALLING);
+  attachInterrupt(digitalPinToInterrupt(rightSensor), countRight, FALLING);
 }
-
 void loop() {
-}
-
-void runStory6() {
-  while (pulseCount < targetPulses) {
-    digitalWrite(MOTOR_L_FWD, HIGH);
-    digitalWrite(MOTOR_R_FWD, HIGH);
-  }
-  
-  stopRobot();
-}
-
-void addPulse() {
-  pulseCount++; 
-}
-
-void stopRobot() {
-  digitalWrite(MOTOR_L_FWD, LOW);
-  digitalWrite(MOTOR_R_FWD, LOW);
+  story6();   // Runs once when reset is pressed
 }
