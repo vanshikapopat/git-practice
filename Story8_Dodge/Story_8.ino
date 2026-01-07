@@ -1,68 +1,105 @@
+// STORY 8 – DODGE
 
+const int LEFT_REV     = 12;
+const int LEFT_FWD     = 11;
+const int LEFT_ENABLE  = 10;
 
-// Motor Pins
-const int MOTOR_L_FWD = 5;  // Green LED 1
-const int MOTOR_R_FWD = 6;  // Green LED 2
-const int MOTOR_L_REV = 3;  // Red LED 1
-const int MOTOR_R_REV = 4;  // Red LED 2
+const int RIGHT_ENABLE = 9; 
+const int RIGHT_FWD    = 8;
+const int RIGHT_REV    = 7;
 
-const int BUTTON_PIN = 2;   
-volatile bool obstacleDetected = false;
+const int OBSTACLE_BTN = 2;   
+const int SPEED_FWD   = 180; 
+const int SPEED_TURN  = 180;
+
+const int PAUSE_MS    = 500;
+const int REVERSE_MS  = 600;
+const int TURN_90_MS  = 850; 
+
+void moveForward() {
+  digitalWrite(LEFT_FWD, HIGH);
+  digitalWrite(LEFT_REV, LOW);
+  digitalWrite(RIGHT_FWD, HIGH);
+  digitalWrite(RIGHT_REV, LOW);
+
+  analogWrite(LEFT_ENABLE, SPEED_FWD);
+  analogWrite(RIGHT_ENABLE, SPEED_FWD);
+}
+
+void stopRobot() {
+  analogWrite(LEFT_ENABLE, 0);
+  analogWrite(RIGHT_ENABLE, 0);
+
+  digitalWrite(LEFT_FWD, LOW);
+  digitalWrite(LEFT_REV, LOW);
+  digitalWrite(RIGHT_FWD, LOW);
+  digitalWrite(RIGHT_REV, LOW);
+}
+
+void reverseRobot(int ms) {
+  digitalWrite(LEFT_FWD, LOW);
+  digitalWrite(LEFT_REV, HIGH);
+  digitalWrite(RIGHT_FWD, LOW);
+  digitalWrite(RIGHT_REV, HIGH);
+
+  analogWrite(LEFT_ENABLE, SPEED_FWD);
+  analogWrite(RIGHT_ENABLE, SPEED_FWD);
+  delay(ms);
+}
+
+void turnLeft90(int ms) {
+  digitalWrite(LEFT_FWD, HIGH);
+  digitalWrite(LEFT_REV, LOW);
+  digitalWrite(RIGHT_FWD, HIGH);
+  digitalWrite(RIGHT_REV, LOW);
+
+  analogWrite(LEFT_ENABLE, 0);
+  analogWrite(RIGHT_ENABLE, SPEED_TURN);
+  delay(ms);
+}
+bool obstaclePressed() {
+  return digitalRead(OBSTACLE_BTN) == LOW;
+}
+
+bool obstacleTriggeredOnce() {
+  if (!obstaclePressed()) return false;
+
+  delay(30);
+  if (!obstaclePressed()) return false;
+
+  while (obstaclePressed()) { }
+  delay(30);
+  return true;
+}
 
 void setup() {
-  pinMode(MOTOR_L_FWD, OUTPUT);
-  pinMode(MOTOR_R_FWD, OUTPUT);
-  pinMode(MOTOR_L_REV, OUTPUT);
-  pinMode(MOTOR_R_REV, OUTPUT);
-  
-  pinMode(BUTTON_PIN, INPUT_PULLUP);
-  
-  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), triggerObstacle, FALLING);
+  pinMode(LEFT_REV, OUTPUT);
+  pinMode(LEFT_FWD, OUTPUT);
+  pinMode(LEFT_ENABLE, OUTPUT);
+
+  pinMode(RIGHT_ENABLE, OUTPUT);
+  pinMode(RIGHT_FWD, OUTPUT);
+  pinMode(RIGHT_REV, OUTPUT);
+
+  pinMode(OBSTACLE_BTN, INPUT_PULLUP);
+
+  stopRobot();
 }
 
 void loop() {
-  if (obstacleDetected) {
-    executeEscape();
-    obstacleDetected = false; // Reset for next obstacle
-  } else {
-    driveForward();
+  moveForward();
+
+  // If obstacle within 12cm is detected
+  if (obstacleTriggeredOnce()) {
+    stopRobot();
+    delay(PAUSE_MS);
+
+    reverseRobot(REVERSE_MS);
+    stopRobot();
+    delay(200);
+
+    turnLeft90(TURN_90_MS);
+    stopRobot();
+    delay(200);
   }
-}
-
-void triggerObstacle() {
-  obstacleDetected = true;
-}
-
-void executeEscape() {
-  // 1. Stop and Pause
-  stopRobot(500); 
-  
-  // 2. Back Up (Red LEDs)
-  digitalWrite(MOTOR_L_REV, HIGH);
-  digitalWrite(MOTOR_R_REV, HIGH);
-  delay(1000); 
-  stopRobot(200);
-
-  // 3. Turn 90 Degrees Left
-  // To turn left, stop left motor and drive right motor forward
-  digitalWrite(MOTOR_L_FWD, LOW);
-  digitalWrite(MOTOR_R_FWD, HIGH);
-  delay(850);
-  
-  stopRobot(500);
-}
-
-void driveForward() {
-  digitalWrite(MOTOR_L_FWD, HIGH);
-  digitalWrite(MOTOR_R_FWD, HIGH);
-  digitalWrite(MOTOR_L_REV, LOW);
-  digitalWrite(MOTOR_R_REV, LOW);
-}
-
-void stopRobot(int duration) {
-  digitalWrite(MOTOR_L_FWD, LOW);
-  digitalWrite(MOTOR_R_FWD, LOW);
-  digitalWrite(MOTOR_L_REV, LOW);
-  digitalWrite(MOTOR_R_REV, LOW);
-  delay(duration);
 }
