@@ -1,28 +1,40 @@
+// STORY 9 – CLIFF
 
-// Motor Pins
-const int MOTOR_L_FWD = 5;
-const int MOTOR_R_FWD = 6;
-const int MOTOR_L_REV = 3;
-const int MOTOR_R_REV = 4;
+const int LEFT_REV     = 12;
+const int LEFT_FWD     = 11;
+const int LEFT_ENABLE  = 10;   // PWM
 
-const int BUTTON_PIN = 2; // cliff sensor
+const int RIGHT_ENABLE = 9;    // PWM
+const int RIGHT_FWD    = 8;
+const int RIGHT_REV    = 7;
+
+const int BUTTON_PIN = 2;      // interrupt pin
 volatile bool cliffDetected = false;
 
+const int SPEED = 180;         
+
 void setup() {
-  pinMode(MOTOR_L_FWD, OUTPUT);
-  pinMode(MOTOR_R_FWD, OUTPUT);
-  pinMode(MOTOR_L_REV, OUTPUT);
-  pinMode(MOTOR_R_REV, OUTPUT);
-  
+  pinMode(LEFT_REV, OUTPUT);
+  pinMode(LEFT_FWD, OUTPUT);
+  pinMode(LEFT_ENABLE, OUTPUT);
+
+  pinMode(RIGHT_ENABLE, OUTPUT);
+  pinMode(RIGHT_FWD, OUTPUT);
+  pinMode(RIGHT_REV, OUTPUT);
+
   pinMode(BUTTON_PIN, INPUT_PULLUP);
+
   attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), triggerCliff, FALLING);
+
+  stopRobot();
 }
 
 void loop() {
   if (cliffDetected) {
     executeCliffSafety();
-    while(true) { 
-      stopRobot(); 
+
+    while (true) {
+      stopRobot();
     }
   } else {
     driveForward();
@@ -34,27 +46,44 @@ void triggerCliff() {
 }
 
 void executeCliffSafety() {
-  stopRobot();      
-  delay(200);       
-  
-  // Reverse for half a second
-  digitalWrite(MOTOR_L_REV, HIGH);
-  digitalWrite(MOTOR_R_REV, HIGH);
-  delay(500); 
-  
-  stopRobot();      
+  stopRobot();
+  delay(200);
+
+  driveReverse();
+  delay(500);
+
+  stopRobot();
 }
 
 void driveForward() {
-  digitalWrite(MOTOR_L_FWD, HIGH);
-  digitalWrite(MOTOR_R_FWD, HIGH);
-  digitalWrite(MOTOR_L_REV, LOW);
-  digitalWrite(MOTOR_R_REV, LOW);
+  // Forward direction pins
+  digitalWrite(LEFT_FWD, HIGH);
+  digitalWrite(LEFT_REV, LOW);
+
+  digitalWrite(RIGHT_FWD, HIGH);
+  digitalWrite(RIGHT_REV, LOW);
+
+  analogWrite(LEFT_ENABLE, SPEED);
+  analogWrite(RIGHT_ENABLE, SPEED);
+}
+
+void driveReverse() {
+  digitalWrite(LEFT_FWD, LOW);
+  digitalWrite(LEFT_REV, HIGH);
+
+  digitalWrite(RIGHT_FWD, LOW);
+  digitalWrite(RIGHT_REV, HIGH);
+
+  analogWrite(LEFT_ENABLE, SPEED);
+  analogWrite(RIGHT_ENABLE, SPEED);
 }
 
 void stopRobot() {
-  digitalWrite(MOTOR_L_FWD, LOW);
-  digitalWrite(MOTOR_R_FWD, LOW);
-  digitalWrite(MOTOR_L_REV, LOW);
-  digitalWrite(MOTOR_R_REV, LOW);
+  analogWrite(LEFT_ENABLE, 0);
+  analogWrite(RIGHT_ENABLE, 0);
+
+  digitalWrite(LEFT_FWD, LOW);
+  digitalWrite(LEFT_REV, LOW);
+  digitalWrite(RIGHT_FWD, LOW);
+  digitalWrite(RIGHT_REV, LOW);
 }
