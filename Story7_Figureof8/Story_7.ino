@@ -1,105 +1,97 @@
-// STORY 7 - SQUARE FIGURE OF 8 
+// Motor pins
+const int leftRev     = 12;
+const int leftFwd     = 11;
+const int leftEnable  = 10;
 
-const int LEFT_REV     = 12;
-const int LEFT_FWD     = 11;
-const int LEFT_ENABLE  = 10; 
+const int rightEnable = 9;
+const int rightFwd    = 8;
+const int rightRev    = 7;
 
-const int RIGHT_ENABLE = 9;  
-const int RIGHT_FWD    = 8;
-const int RIGHT_REV    = 7;
+const int DRIVE_OUT_MS = 2000;
+const int DRIVE_SIDE_MS = 2000;
+const int TURN_MS = 850;
 
-const unsigned long EXIT_TIME  = 2000;  // leave garage (2s)
-const unsigned long TURN_TIME  = 850;   // 90 degree turn
-const unsigned long DRIVE_TIME = 1500;  // length of each side (adjust)
+void moveForward() {
+  digitalWrite(leftEnable, HIGH);
+  digitalWrite(leftFwd, HIGH);
+  digitalWrite(leftRev, LOW);
 
-const int SPEED_STRAIGHT = 180;
-const int SPEED_TURN     = 180;
-
-void stopRobot() {
-  analogWrite(LEFT_ENABLE, 0);
-  analogWrite(RIGHT_ENABLE, 0);
-
-  digitalWrite(LEFT_FWD, LOW);
-  digitalWrite(LEFT_REV, LOW);
-  digitalWrite(RIGHT_FWD, LOW);
-  digitalWrite(RIGHT_REV, LOW);
+  digitalWrite(rightEnable, HIGH);
+  digitalWrite(rightFwd, HIGH);
+  digitalWrite(rightRev, LOW);
 }
 
-void driveForward(int speedPWM) {
-  digitalWrite(LEFT_FWD, HIGH);
-  digitalWrite(LEFT_REV, LOW);
-  digitalWrite(RIGHT_FWD, HIGH);
-  digitalWrite(RIGHT_REV, LOW);
+void stopMotors() {
+  digitalWrite(leftEnable, LOW);
+  digitalWrite(rightEnable, LOW);
 
-  analogWrite(LEFT_ENABLE, speedPWM);
-  analogWrite(RIGHT_ENABLE, speedPWM);
+  digitalWrite(leftFwd, LOW);
+  digitalWrite(leftRev, LOW);
+  digitalWrite(rightFwd, LOW);
+  digitalWrite(rightRev, LOW);
 }
 
-void driveForwardFor(unsigned long ms, int speedPWM) {
-  driveForward(speedPWM);
+void turnLeft() {
+  digitalWrite(leftEnable, HIGH);
+  digitalWrite(leftFwd, LOW);
+  digitalWrite(leftRev, HIGH);
+
+  digitalWrite(rightEnable, HIGH);
+  digitalWrite(rightFwd, HIGH);
+  digitalWrite(rightRev, LOW);
+}
+
+void turnRight() {
+  digitalWrite(leftEnable, HIGH);
+  digitalWrite(leftFwd, HIGH);
+  digitalWrite(leftRev, LOW);
+
+  digitalWrite(rightEnable, HIGH);
+  digitalWrite(rightFwd, LOW);
+  digitalWrite(rightRev, HIGH);
+}
+
+void moveForwardTimed(int ms) {
+  moveForward();
   delay(ms);
 }
 
-void turnLeftFor(unsigned long ms, int speedPWM) {
-  digitalWrite(LEFT_FWD, HIGH);
-  digitalWrite(LEFT_REV, LOW);
-  digitalWrite(RIGHT_FWD, HIGH);
-  digitalWrite(RIGHT_REV, LOW);
-
-  analogWrite(LEFT_ENABLE, 0);       
-  analogWrite(RIGHT_ENABLE, speedPWM);
+void turnLeftTimed(int ms) {
+  turnLeft();
   delay(ms);
 }
 
-void turnRightFor(unsigned long ms, int speedPWM) {
-  digitalWrite(LEFT_FWD, HIGH);
-  digitalWrite(LEFT_REV, LOW);
-  digitalWrite(RIGHT_FWD, HIGH);
-  digitalWrite(RIGHT_REV, LOW);
-
-  analogWrite(LEFT_ENABLE, speedPWM);
-  analogWrite(RIGHT_ENABLE, 0);      
+void turnRightTimed(int ms) {
+  turnRight();
   delay(ms);
 }
-
-
-void leftHandSquare() {
-  for (int i = 0; i < 4; i++) {
-    driveForwardFor(DRIVE_TIME, SPEED_STRAIGHT);
-    turnLeftFor(TURN_TIME, SPEED_TURN);
-  }
-}
-
-void rightHandSquare() {
-  for (int i = 0; i < 4; i++) {
-    driveForwardFor(DRIVE_TIME, SPEED_STRAIGHT);
-    turnRightFor(TURN_TIME, SPEED_TURN);
-  }
-}
-
 
 void story7_FigureOf8() {
-  driveForwardFor(EXIT_TIME, SPEED_STRAIGHT);
-  leftHandSquare();
+  moveForwardTimed(DRIVE_OUT_MS);
 
-  rightHandSquare();
+  for (int side = 0; side < 4; side++) {
+    moveForwardTimed(DRIVE_SIDE_MS);
+    turnLeftTimed(TURN_MS);
+  }
 
-  stopRobot();
-  while (true) { }
+  for (int side = 0; side < 4; side++) {
+    moveForwardTimed(DRIVE_SIDE_MS);
+    turnRightTimed(TURN_MS);
+  }
+  stopMotors();
+  exit(0);
 }
 
 void setup() {
-  pinMode(LEFT_REV, OUTPUT);
-  pinMode(LEFT_FWD, OUTPUT);
-  pinMode(LEFT_ENABLE, OUTPUT);
+  pinMode(leftRev, OUTPUT);
+  pinMode(leftFwd, OUTPUT);
+  pinMode(leftEnable, OUTPUT);
 
-  pinMode(RIGHT_ENABLE, OUTPUT);
-  pinMode(RIGHT_FWD, OUTPUT);
-  pinMode(RIGHT_REV, OUTPUT);
-
-  stopRobot();
+  pinMode(rightEnable, OUTPUT);
+  pinMode(rightFwd, OUTPUT);
+  pinMode(rightRev, OUTPUT);
 }
 
 void loop() {
-  story7_FigureOf8();  
+  story7_FigureOf8();
 }
