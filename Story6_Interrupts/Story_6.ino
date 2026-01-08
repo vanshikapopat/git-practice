@@ -1,5 +1,4 @@
-// STORY 6 – INTERRUPTS
-
+// Motor control pins
 const int leftRev     = 12;
 const int leftFwd     = 11;
 const int leftEnable  = 10;
@@ -8,18 +7,22 @@ const int rightEnable = 9;
 const int rightFwd    = 8;
 const int rightRev    = 7;
 
-const int leftSensor  = 2;   // Interrupt pin
-const int rightSensor = 3;   // Interrupt pin
+const int LEFT_FEEDBACK  = 3;
+const int RIGHT_FEEDBACK = 2;
 
-volatile int pulseCount = 0;
-const int pulsesFor2m = 100;   // Calibrated value
+volatile int leftcounter  = 0;
+volatile int rightcounter = 0;
 
-void countLeft() {
-  pulseCount++;
+const int COUNTS_PER_METER = 435;
+const int TARGET_DISTANCE  = 2;
+const int TARGET_COUNTS    = COUNTS_PER_METER * TARGET_DISTANCE;
+
+void LeftMotorISR() {
+  leftcounter++;
 }
 
-void countRight() {
-  pulseCount++;
+void RightMotorISR() {
+  rightcounter++;
 }
 void moveForward() {
   digitalWrite(leftEnable, HIGH);
@@ -40,21 +43,22 @@ void stopMotors() {
   digitalWrite(rightFwd, LOW);
   digitalWrite(rightRev, LOW);
 }
-
 void story6() {
-  pulseCount = 0;     // Reset distance
-  moveForward();      // Start moving
+  leftcounter  = 0;
+  rightcounter = 0;
 
-  while (pulseCount < pulsesFor2m) {
+  moveForward();
+
+  while ((leftcounter + rightcounter) / 2 < TARGET_COUNTS) {
   }
 
-  stopMotors();       
-
-  while (true) {
-  }
+  stopMotors();
+  exit(0);  
 }
 
 void setup() {
+  Serial.begin(115200);
+
   pinMode(leftRev, OUTPUT);
   pinMode(leftFwd, OUTPUT);
   pinMode(leftEnable, OUTPUT);
@@ -63,12 +67,13 @@ void setup() {
   pinMode(rightFwd, OUTPUT);
   pinMode(rightRev, OUTPUT);
 
-  pinMode(leftSensor, INPUT_PULLUP);
-  pinMode(rightSensor, INPUT_PULLUP);
+  pinMode(LEFT_FEEDBACK, INPUT_PULLUP);
+  pinMode(RIGHT_FEEDBACK, INPUT_PULLUP);
 
-  attachInterrupt(digitalPinToInterrupt(leftSensor), countLeft, FALLING);
-  attachInterrupt(digitalPinToInterrupt(rightSensor), countRight, FALLING);
+  attachInterrupt(digitalPinToInterrupt(LEFT_FEEDBACK), LeftMotorISR, RISING);
+  attachInterrupt(digitalPinToInterrupt(RIGHT_FEEDBACK), RightMotorISR, RISING);
 }
+
 void loop() {
-  story6();   // Runs once when reset is pressed
+  story6();   // runs once after reset
 }
