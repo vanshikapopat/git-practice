@@ -1,105 +1,100 @@
-// STORY 8 – DODGE
+#define TRIGGER_PIN 4
+#define ECHO_PIN 5
+#define MAX_DISTANCE 200  
 
-const int LEFT_REV     = 12;
-const int LEFT_FWD     = 11;
-const int LEFT_ENABLE  = 10;
+NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE);
 
-const int RIGHT_ENABLE = 9; 
-const int RIGHT_FWD    = 8;
-const int RIGHT_REV    = 7;
+const int leftRev     = 12;
+const int leftFwd     = 11;
+const int leftEnable  = 10;
 
-const int OBSTACLE_BTN = 2;   
-const int SPEED_FWD   = 180; 
-const int SPEED_TURN  = 180;
+const int rightEnable = 9;
+const int rightFwd    = 8;
+const int rightRev    = 7;
 
-const int PAUSE_MS    = 500;
-const int REVERSE_MS  = 600;
-const int TURN_90_MS  = 850; 
+const int OBSTACLE_CM = 12;   
+const int PAUSE_MS    = 300;  
+const int BACKUP_MS   = 600;   
+const int TURN90_MS   = 850;    
 
 void moveForward() {
-  digitalWrite(LEFT_FWD, HIGH);
-  digitalWrite(LEFT_REV, LOW);
-  digitalWrite(RIGHT_FWD, HIGH);
-  digitalWrite(RIGHT_REV, LOW);
+  digitalWrite(leftEnable, HIGH);
+  digitalWrite(leftFwd, HIGH);
+  digitalWrite(leftRev, LOW);
 
-  analogWrite(LEFT_ENABLE, SPEED_FWD);
-  analogWrite(RIGHT_ENABLE, SPEED_FWD);
+  digitalWrite(rightEnable, HIGH);
+  digitalWrite(rightFwd, HIGH);
+  digitalWrite(rightRev, LOW);
 }
 
-void stopRobot() {
-  analogWrite(LEFT_ENABLE, 0);
-  analogWrite(RIGHT_ENABLE, 0);
+void stopMotors() {
+  digitalWrite(leftEnable, LOW);
+  digitalWrite(rightEnable, LOW);
 
-  digitalWrite(LEFT_FWD, LOW);
-  digitalWrite(LEFT_REV, LOW);
-  digitalWrite(RIGHT_FWD, LOW);
-  digitalWrite(RIGHT_REV, LOW);
+  digitalWrite(leftFwd, LOW);
+  digitalWrite(leftRev, LOW);
+  digitalWrite(rightFwd, LOW);
+  digitalWrite(rightRev, LOW);
 }
 
-void reverseRobot(int ms) {
-  digitalWrite(LEFT_FWD, LOW);
-  digitalWrite(LEFT_REV, HIGH);
-  digitalWrite(RIGHT_FWD, LOW);
-  digitalWrite(RIGHT_REV, HIGH);
+void moveBackward() {
+  digitalWrite(leftEnable, HIGH);
+  digitalWrite(leftFwd, LOW);
+  digitalWrite(leftRev, HIGH);
 
-  analogWrite(LEFT_ENABLE, SPEED_FWD);
-  analogWrite(RIGHT_ENABLE, SPEED_FWD);
-  delay(ms);
+  digitalWrite(rightEnable, HIGH);
+  digitalWrite(rightFwd, LOW);
+  digitalWrite(rightRev, HIGH);
 }
 
-void turnLeft90(int ms) {
-  digitalWrite(LEFT_FWD, HIGH);
-  digitalWrite(LEFT_REV, LOW);
-  digitalWrite(RIGHT_FWD, HIGH);
-  digitalWrite(RIGHT_REV, LOW);
+void turnLeft() {
+  digitalWrite(leftEnable, HIGH);
+  digitalWrite(leftFwd, LOW);
+  digitalWrite(leftRev, HIGH);
 
-  analogWrite(LEFT_ENABLE, 0);
-  analogWrite(RIGHT_ENABLE, SPEED_TURN);
-  delay(ms);
-}
-bool obstaclePressed() {
-  return digitalRead(OBSTACLE_BTN) == LOW;
-}
-
-bool obstacleTriggeredOnce() {
-  if (!obstaclePressed()) return false;
-
-  delay(30);
-  if (!obstaclePressed()) return false;
-
-  while (obstaclePressed()) { }
-  delay(30);
-  return true;
+  digitalWrite(rightEnable, HIGH);
+  digitalWrite(rightFwd, HIGH);
+  digitalWrite(rightRev, LOW);
 }
 
 void setup() {
-  pinMode(LEFT_REV, OUTPUT);
-  pinMode(LEFT_FWD, OUTPUT);
-  pinMode(LEFT_ENABLE, OUTPUT);
+  Serial.begin(115200);
 
-  pinMode(RIGHT_ENABLE, OUTPUT);
-  pinMode(RIGHT_FWD, OUTPUT);
-  pinMode(RIGHT_REV, OUTPUT);
+  pinMode(leftRev, OUTPUT);
+  pinMode(leftFwd, OUTPUT);
+  pinMode(leftEnable, OUTPUT);
 
-  pinMode(OBSTACLE_BTN, INPUT_PULLUP);
+  pinMode(rightEnable, OUTPUT);
+  pinMode(rightFwd, OUTPUT);
+  pinMode(rightRev, OUTPUT);
 
-  stopRobot();
+  sonar.ping_cm();
+
+  moveForward();
 }
 
 void loop() {
-  moveForward();
+  unsigned int distance = sonar.ping_cm();
 
-  // If obstacle within 12cm is detected
-  if (obstacleTriggeredOnce()) {
-    stopRobot();
+  Serial.print("Distance (cm): ");
+  Serial.println(distance);
+
+  if (distance > 0 && distance <= OBSTACLE_CM) {
+    stopMotors();
     delay(PAUSE_MS);
 
-    reverseRobot(REVERSE_MS);
-    stopRobot();
-    delay(200);
+    moveBackward();
+    delay(BACKUP_MS);
 
-    turnLeft90(TURN_90_MS);
-    stopRobot();
-    delay(200);
+    stopMotors();
+    delay(PAUSE_MS);
+
+    turnLeft();
+    delay(TURN90_MS);
+
+    stopMotors();
+    delay(PAUSE_MS);
+    moveForward();
   }
+  delay(50);
 }
