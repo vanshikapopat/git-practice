@@ -1,89 +1,93 @@
-// STORY 9 – CLIFF
+#define TRIGGER_PIN 4
+#define ECHO_PIN 5
 
-const int LEFT_REV     = 12;
-const int LEFT_FWD     = 11;
-const int LEFT_ENABLE  = 10;   // PWM
+#define TRIGGER_DOWN 13
+#define ECHO_DOWN 17
 
-const int RIGHT_ENABLE = 9;    // PWM
-const int RIGHT_FWD    = 8;
-const int RIGHT_REV    = 7;
+#define MAX_DISTANCE 200
 
-const int BUTTON_PIN = 2;      // interrupt pin
-volatile bool cliffDetected = false;
+NewPing sonarFront(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE);
+NewPing sonarDown(TRIGGER_DOWN, ECHO_DOWN, MAX_DISTANCE);
 
-const int SPEED = 180;         
+const int leftRev     = 12;
+const int leftFwd     = 11;
+const int leftEnable  = 10;
+
+const int rightEnable = 9;
+const int rightFwd    = 8;
+const int rightRev    = 7;
+
+const int GROUND_OK_CM   = 5;     
+const int DROP_LIMIT_CM  = 12;    
+
+void moveForward() {
+  digitalWrite(leftEnable, HIGH);
+  digitalWrite(leftFwd, HIGH);
+  digitalWrite(leftRev, LOW);
+
+  digitalWrite(rightEnable, HIGH);
+  digitalWrite(rightFwd, HIGH);
+  digitalWrite(rightRev, LOW);
+}
+
+void moveBackward() {
+  digitalWrite(leftEnable, HIGH);
+  digitalWrite(leftFwd, LOW);
+  digitalWrite(leftRev, HIGH);
+
+  digitalWrite(rightEnable, HIGH);
+  digitalWrite(rightFwd, LOW);
+  digitalWrite(rightRev, HIGH);
+}
+
+void stopMotors() {
+  digitalWrite(leftEnable, LOW);
+  digitalWrite(rightEnable, LOW);
+
+  digitalWrite(leftFwd, LOW);
+  digitalWrite(leftRev, LOW);
+  digitalWrite(rightFwd, LOW);
+  digitalWrite(rightRev, LOW);
+}
 
 void setup() {
-  pinMode(LEFT_REV, OUTPUT);
-  pinMode(LEFT_FWD, OUTPUT);
-  pinMode(LEFT_ENABLE, OUTPUT);
+  Serial.begin(115200);
 
-  pinMode(RIGHT_ENABLE, OUTPUT);
-  pinMode(RIGHT_FWD, OUTPUT);
-  pinMode(RIGHT_REV, OUTPUT);
+  pinMode(leftRev, OUTPUT);
+  pinMode(leftFwd, OUTPUT);
+  pinMode(leftEnable, OUTPUT);
 
-  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  pinMode(rightEnable, OUTPUT);
+  pinMode(rightFwd, OUTPUT);
+  pinMode(rightRev, OUTPUT);
 
-  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), triggerCliff, FALLING);
+  sonarFront.ping_cm();
+  sonarDown.ping_cm();
 
-  stopRobot();
+  moveForward();
 }
 
 void loop() {
-  if (cliffDetected) {
-    executeCliffSafety();
 
-    while (true) {
-      stopRobot();
-    }
-  } else {
-    driveForward();
+  unsigned int groundDistance = sonarDown.ping_cm();
+
+  Serial.print("Ground distance (cm): ");
+  Serial.println(groundDistance);
+
+  if (groundDistance == 0 || groundDistance > DROP_LIMIT_CM) {
+
+    stopMotors();
+    delay(200);
+
+    moveBackward();
+    delay(500);
+
+    stopMotors();
+
+    exit(0);
   }
-}
 
-void triggerCliff() {
-  cliffDetected = true;
-}
+  moveForward();
 
-void executeCliffSafety() {
-  stopRobot();
-  delay(200);
-
-  driveReverse();
-  delay(500);
-
-  stopRobot();
-}
-
-void driveForward() {
-  // Forward direction pins
-  digitalWrite(LEFT_FWD, HIGH);
-  digitalWrite(LEFT_REV, LOW);
-
-  digitalWrite(RIGHT_FWD, HIGH);
-  digitalWrite(RIGHT_REV, LOW);
-
-  analogWrite(LEFT_ENABLE, SPEED);
-  analogWrite(RIGHT_ENABLE, SPEED);
-}
-
-void driveReverse() {
-  digitalWrite(LEFT_FWD, LOW);
-  digitalWrite(LEFT_REV, HIGH);
-
-  digitalWrite(RIGHT_FWD, LOW);
-  digitalWrite(RIGHT_REV, HIGH);
-
-  analogWrite(LEFT_ENABLE, SPEED);
-  analogWrite(RIGHT_ENABLE, SPEED);
-}
-
-void stopRobot() {
-  analogWrite(LEFT_ENABLE, 0);
-  analogWrite(RIGHT_ENABLE, 0);
-
-  digitalWrite(LEFT_FWD, LOW);
-  digitalWrite(LEFT_REV, LOW);
-  digitalWrite(RIGHT_FWD, LOW);
-  digitalWrite(RIGHT_REV, LOW);
+  delay(50); 
 }
